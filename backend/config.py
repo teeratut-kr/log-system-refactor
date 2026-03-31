@@ -1,0 +1,7 @@
+import os
+
+APP_TITLE = "Unified Log Ingestion API"
+SYSLOG_UDP_HOST = os.getenv("SYSLOG_UDP_HOST", "0.0.0.0")
+SYSLOG_UDP_PORT = int(os.getenv("SYSLOG_UDP_PORT", "5514"))
+RETENTION_DAYS = int(os.getenv("RETENTION_DAYS", "7"))
+RETENTION_CLEANUP_INTERVAL_MINUTES = int(os.getenv("RETENTION_CLEANUP_INTERVAL_MINUTES", "60"))
