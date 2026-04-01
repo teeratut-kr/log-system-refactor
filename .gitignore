@@ -11,4 +11,6 @@ __pycache__/
 .vscode/
 *.zip
 *.log
+!sample/firewall_syslog.log
+!sample/router_syslog.log
 .envrc

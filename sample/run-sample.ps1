@@ -7,7 +7,7 @@ param(
     [string]$PostgresDb = "logs_db",
     [string]$PostgresUser = "logs_user",
     [string]$SyslogTargetHost = "127.0.0.1",
-    [int]$SyslogPort = 5514
+    [int]$SyslogPort = 5515
 )
 
 Set-StrictMode -Version Latest

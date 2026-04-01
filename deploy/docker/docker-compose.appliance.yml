@@ -24,13 +24,13 @@ services:
     environment:
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       SYSLOG_UDP_HOST: 0.0.0.0
-      SYSLOG_UDP_PORT: ${SYSLOG_UDP_PORT:-5514}
+      SYSLOG_UDP_PORT: ${SYSLOG_UDP_PORT:-5515}
       RETENTION_DAYS: ${RETENTION_DAYS:-7}
       RETENTION_CLEANUP_INTERVAL_MINUTES: ${RETENTION_CLEANUP_INTERVAL_MINUTES:-60}
       DATABASE_URL: postgresql://${POSTGRES_USER:-logs_user}:${POSTGRES_PASSWORD:-logs_password}@postgres:5432/${POSTGRES_DB:-logs_db}
     ports:
       - "${BACKEND_HOST_PORT:-8012}:8011"
-      - "${SYSLOG_UDP_PORT:-5514}:${SYSLOG_UDP_PORT:-5514}/udp"
+      - "${SYSLOG_UDP_PORT:-5515}:${SYSLOG_UDP_PORT:-5515}/udp"
     depends_on:
       postgres:
         condition: service_healthy

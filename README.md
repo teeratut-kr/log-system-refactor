@@ -153,7 +153,7 @@ Common variables:
 | `API_BASE_URL` | Frontend base URL for backend API | `http://127.0.0.1:8012` |
 | `DATABASE_URL` | PostgreSQL connection string | not set |
 | `SYSLOG_UDP_HOST` | UDP bind host for syslog listener | `0.0.0.0` |
-| `SYSLOG_UDP_PORT` | UDP bind port for syslog listener | `5514` |
+| `SYSLOG_UDP_PORT` | UDP bind port for syslog listener | `5515` |
 | `RETENTION_DAYS` | retention window in days | `7` |
 | `RETENTION_CLEANUP_INTERVAL_MINUTES` | cleanup interval for background retention worker | `60` |
 

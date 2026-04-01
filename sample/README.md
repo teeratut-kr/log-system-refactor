@@ -119,5 +119,5 @@ Reset PostgreSQL logs table:
 - defaults:
   - API base URL: `http://127.0.0.1:8012`
   - UDP syslog host: `127.0.0.1`
-  - UDP syslog port: `5514`
+  - UDP syslog port: `5515`
   - admin user for retention endpoints: `admin1`
