@@ -3,6 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from pydantic import ValidationError
 
+from ..api_models import FileIngestResponse, IngestSingleResponse
 from ..normalizer import normalize_log, normalize_source
 from ..parsers import parse_uploaded_file
 from ..schemas import SingleIngestRequest
@@ -10,7 +11,7 @@ from ..schemas import SingleIngestRequest
 router = APIRouter()
 
 
-@router.post("/ingest")
+@router.post("/ingest", response_model=IngestSingleResponse)
 async def ingest_single(request: Request, payload: SingleIngestRequest):
     try:
         original_payload = await request.json()
@@ -36,7 +37,7 @@ async def ingest_single(request: Request, payload: SingleIngestRequest):
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
-@router.post("/ingest/file")
+@router.post("/ingest/file", response_model=FileIngestResponse)
 async def ingest_file(
     request: Request,
     file: UploadFile = File(...),

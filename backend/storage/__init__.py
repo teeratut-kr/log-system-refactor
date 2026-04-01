@@ -1,4 +1,5 @@
 from .base import Storage
 from .factory import create_storage
 from .memory import InMemoryStorage
-from .postgres import PostgresStorage
+
+__all__ = ["Storage", "create_storage", "InMemoryStorage"]

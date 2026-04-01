@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from .config import APP_TITLE
+from .logging_config import configure_logging
 from .routers import admin_router, ingest_router, query_router, system_router
 from .services.lifecycle import on_shutdown, on_startup
 
@@ -17,6 +18,7 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
+    configure_logging()
     app = FastAPI(title=APP_TITLE, lifespan=lifespan)
     app.include_router(system_router)
     app.include_router(ingest_router)

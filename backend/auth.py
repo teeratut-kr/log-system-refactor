@@ -1,13 +1,9 @@
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Annotated, Optional
 
-from fastapi import HTTPException, Request
+from fastapi import Depends, Header, HTTPException
 
-USERS: Dict[str, Dict[str, Optional[str]]] = {
-    "admin1": {"role": "admin", "tenant": None},
-    "viewerA": {"role": "viewer", "tenant": "demoA"},
-    "viewerB": {"role": "viewer", "tenant": "demoB"},
-}
+from .demo_users import DEMO_USERS, available_users
 
 
 @dataclass
@@ -17,29 +13,28 @@ class UserContext:
     tenant: Optional[str]
 
 
-def get_user_context(request: Request) -> UserContext:
-    username = request.headers.get("X-User")
-    if not username:
+def get_user_context(x_user: Annotated[Optional[str], Header(alias="X-User")] = None) -> UserContext:
+    if not x_user:
         raise HTTPException(
             status_code=401,
             detail={
                 "message": "Missing X-User header",
-                "available_users": list(USERS.keys()),
+                "available_users": available_users(),
             },
         )
 
-    user_record = USERS.get(username)
+    user_record = DEMO_USERS.get(x_user)
     if not user_record:
         raise HTTPException(
             status_code=401,
             detail={
                 "message": "Unknown user",
-                "available_users": list(USERS.keys()),
+                "available_users": available_users(),
             },
         )
 
     return UserContext(
-        username=username,
+        username=x_user,
         role=str(user_record["role"]),
         tenant=user_record["tenant"],
     )
@@ -60,3 +55,8 @@ def authorize_tenant(user: UserContext, requested_tenant: Optional[str]) -> Opti
 def require_admin(user: UserContext) -> None:
     if user.role != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
+
+
+def get_admin_user(user: Annotated[UserContext, Depends(get_user_context)]) -> UserContext:
+    require_admin(user)
+    return user

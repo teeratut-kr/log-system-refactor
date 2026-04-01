@@ -1,16 +1,18 @@
-from typing import Optional
+from typing import Annotated, Optional
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Depends, Query, Request
 
-from ..auth import authorize_tenant, get_user_context
+from ..api_models import AlertsResponse, LogsResponse
+from ..auth import UserContext, authorize_tenant, get_user_context
 from ..response_utils import clean_log_items
 
 router = APIRouter()
 
 
-@router.get("/logs")
+@router.get("/logs", response_model=LogsResponse)
 async def get_logs(
     request: Request,
+    user: Annotated[UserContext, Depends(get_user_context)],
     limit: int = Query(default=100, ge=1, le=1000),
     offset: int = Query(default=0, ge=0),
     tenant: Optional[str] = None,
@@ -23,7 +25,6 @@ async def get_logs(
     q: Optional[str] = None,
     tag: Optional[str] = None,
 ):
-    user = get_user_context(request)
     effective_tenant = authorize_tenant(user, tenant)
     result = await request.app.state.storage.query_logs(
         limit=limit,
@@ -51,9 +52,10 @@ async def get_logs(
     }
 
 
-@router.get("/alerts")
+@router.get("/alerts", response_model=AlertsResponse)
 async def get_alerts(
     request: Request,
+    user: Annotated[UserContext, Depends(get_user_context)],
     tenant: Optional[str] = None,
     start: Optional[str] = None,
     end: Optional[str] = None,
@@ -61,7 +63,6 @@ async def get_alerts(
     window_minutes: int = Query(default=5, ge=1, le=60),
     limit: int = Query(default=100, ge=1, le=1000),
 ):
-    user = get_user_context(request)
     effective_tenant = authorize_tenant(user, tenant)
     result = await request.app.state.storage.query_alerts(
         tenant=effective_tenant,

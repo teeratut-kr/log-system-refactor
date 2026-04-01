@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from .schemas import DEFAULT_TENANT, NormalizedLog, SourceEnum
@@ -32,8 +32,10 @@ def first_non_empty(data: Dict[str, Any], *keys: str) -> Any:
 
 
 def normalize_timestamp(value: Any) -> str:
+    now_utc = datetime.now(timezone.utc).replace(microsecond=0)
+
     if value in (None, ""):
-        return datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+        return now_utc.isoformat().replace("+00:00", "Z")
 
     text = str(value).strip()
 
@@ -44,17 +46,17 @@ def normalize_timestamp(value: Any) -> str:
         dt = datetime.fromisoformat(text.replace(" ", "T"))
         if dt.tzinfo is None:
             return dt.replace(microsecond=0).isoformat() + "Z"
-        return dt.isoformat().replace("+00:00", "Z")
+        return dt.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     except ValueError:
         pass
 
     try:
-        dt = datetime.strptime(f"{datetime.utcnow().year} {text}", "%Y %b %d %H:%M:%S")
+        dt = datetime.strptime(f"{now_utc.year} {text}", "%Y %b %d %H:%M:%S")
         return dt.replace(microsecond=0).isoformat() + "Z"
     except ValueError:
         pass
 
-    return datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+    return now_utc.isoformat().replace("+00:00", "Z")
 
 
 def normalize_source(value: Any, default: str) -> str:
