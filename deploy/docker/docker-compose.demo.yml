@@ -1,0 +1,42 @@
+services:
+  backend:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/dockerfile.backend
+    container_name: log-system-refactor-backend
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      SYSLOG_UDP_HOST: 0.0.0.0
+      SYSLOG_UDP_PORT: ${SYSLOG_UDP_PORT:-5514}
+      RETENTION_DAYS: ${RETENTION_DAYS:-7}
+      RETENTION_CLEANUP_INTERVAL_MINUTES: ${RETENTION_CLEANUP_INTERVAL_MINUTES:-60}
+    ports:
+      - "${BACKEND_HOST_PORT:-8012}:8011"
+      - "${SYSLOG_UDP_PORT:-5514}:${SYSLOG_UDP_PORT:-5514}/udp"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8011/').read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/dockerfile.dashboard
+    container_name: log-system-refactor-dashboard
+    environment:
+      API_BASE_URL: ${API_BASE_URL:-http://backend:8011}
+    ports:
+      - "${DASHBOARD_HOST_PORT:-8502}:8501"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health').read()"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
