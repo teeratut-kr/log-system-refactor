@@ -272,7 +272,10 @@ def format_logs_table(df: pd.DataFrame) -> pd.DataFrame:
         sev = pd.to_numeric(display_df["severity"], errors="coerce")
         display_df["severity"] = sev.apply(lambda x: "-" if pd.isna(x) else str(int(x)))
 
-    return display_df.fillna("-")
+    display_df = display_df.fillna("-").reset_index(drop=True)
+    display_df.index = display_df.index + 1
+
+    return display_df
 
 
 def format_alerts_table(alerts: List[Dict[str, Any]]) -> pd.DataFrame:
